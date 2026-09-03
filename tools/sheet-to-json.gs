@@ -15,7 +15,6 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Export JSON')
     .addItem('Download JSON…', 'downloadJson')
-    .addItem('Save JSON to Drive', 'saveJsonToDrive')
     .addToUi();
 }
 
@@ -36,21 +35,6 @@ function downloadJson() {
     .setWidth(460)
     .setHeight(180);
   SpreadsheetApp.getUi().showModalDialog(html, 'Export JSON');
-}
-
-function saveJsonToDrive() {
-  var out = buildJson();
-  var folder = spreadsheetFolder();
-  // Replace a previous export of the same name instead of creating "(1)" copies.
-  var existing = folder.getFilesByName(out.fileName);
-  while (existing.hasNext()) {
-    existing.next().setTrashed(true);
-  }
-  var file = folder.createFile(out.fileName, out.json, MimeType.PLAIN_TEXT);
-  SpreadsheetApp.getUi().alert(
-    'Saved ' + out.rowCount + ' rows to Google Drive.\n\n' +
-    'File: ' + out.fileName + '\n' +
-    'Folder: ' + folder.getName() + '\n\n' + file.getUrl());
 }
 
 /** Reads the active sheet and returns { json, fileName, sheetName, rowCount }. */
@@ -102,12 +86,6 @@ function isBlankRow(row) {
     }
   }
   return true;
-}
-
-/** The spreadsheet's own Drive folder, falling back to My Drive. */
-function spreadsheetFolder() {
-  var parents = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId()).getParents();
-  return parents.hasNext() ? parents.next() : DriveApp.getRootFolder();
 }
 
 function escapeHtml(text) {
