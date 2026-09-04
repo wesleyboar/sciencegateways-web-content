@@ -1,0 +1,35 @@
+.virtual-tutorials-pullout {
+	background: linear-gradient(to right, #f3f6fb, #ffffff);
+	border-left: 6px solid #202A44;
+	padding: 1.1rem 1.3rem;
+	margin: 1.5rem 0 2rem;
+	border-radius: 10px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.virtual-tutorials-pullout .vt-label {
+	display: inline-block;
+	background: #202A44;
+	color: #fff;
+	font-size: 0.72rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	padding: 0.25rem 0.55rem;
+	border-radius: 999px;
+	margin-bottom: 0.6rem;
+	font-weight: 600;
+}
+
+.virtual-tutorials-pullout h3 {
+	margin: 0 0 0.5rem;
+	color: #202A44;
+}
+
+.virtual-tutorials-pullout p {
+	margin: 0.35rem 0;
+}
+
+.virtual-tutorials-pullout .vt-dates {
+	font-size: 1.05rem;
+	font-weight: 600;
+}
