@@ -6,11 +6,7 @@
  * (to the right of Help)
  */
 
-// NOTE: We append `.txt`, because:
-// 1. Non-technical users are unfamiliar with JSON
-// 2. Consuming software may not accept `.json`
-// 3. Technical users can strip the `.txt`
-const FILE_EXTENSION = '.json.txt';
+const FILE_EXTENSION = '.json';
 
 function onOpen() {
   SpreadsheetApp.getUi()
