@@ -76,9 +76,6 @@ function buildJson() {
   if (spreadsheet.getSheets().length > 1) {
     base += '_' + sheet.getName();
   }
-  // Date of export, in the spreadsheet's own time zone, e.g. "Sep 03".
-  base += ' ' + Utilities.formatDate(
-    new Date(), spreadsheet.getSpreadsheetTimeZone(), 'MMM dd');
 
   return {
     json: JSON.stringify(records, null, 2) + '\n',
