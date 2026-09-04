@@ -1,0 +1,506 @@
+<h4>Your pathway to finding gateways, technologies, knowledge, and solutions</h4>
+
+<p>Our resources are a work in progress. We welcome additions of all types. If you have something that you&rsquo;d like to contribute, let us know at&nbsp;<a>help@sciencegateways.org</a>.</p>
+
+<p>Gateway-related learning, teaching, and resource materials can be found in our&nbsp;<strong>Resource Search</strong>,</p>
+<script>
+	setTimeout(function(){
+		$('.tabstract').hide();
+		$(".grey_button a").click(function(){
+			$(this).closest('tr').next('tr').find('.tabstract').slideToggle('2000',"swing", function () {
+				// Animation complete.
+			});
+		});
+
+
+	}, 2000);
+</script>
+<style type="text/css">#resourcecontainer {
+	width: 100%;
+	display: flex;
+}
+
+#courses {
+	min-height: 900px;
+}
+
+#typetitle, #domaintitle {
+	background: #131313;
+	padding: 0 5px;
+	font-weight: bold;
+	margin-bottom: 1em;
+}
+
+#typetitle *, 
+#domaintitle * {
+	color: #fff;
+	text-decoration: none;
+}
+
+#domaintitle {
+	margin-top: 2em;
+}
+
+
+#typechoice {
+//position: absolute;
+//margin-left: -45%;
+	width: 20%;
+	margin-top: 200px;
+}
+#tabledisplay {
+	width: 70%;
+	margin-left: 16px;
+}
+
+
+#courses table {
+	box-shadow: none;
+	margin: 5px;
+	width: 100%;
+	border-bottom: 1px solid black;
+}
+
+#courses #tableheader {
+	background: #424242;
+	color: white;
+}
+
+#courses #tableheader * {
+	color: white;
+}
+
+
+
+div:empty {
+	display: none;
+}
+
+
+.grey_button a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+#courses table td{
+	font-size: 1.1em;
+	color: #000;
+	border: 0;
+	vertical-align: top;
+}
+
+#courses table td{
+	width: 18%;
+}
+
+#courses table tr:first-child td{
+	padding: .5em;
+}
+
+#courses table td.item{
+	width: 45%;
+}
+
+.tabstract {
+	border: 1px solid #fff;
+	margin: 5px;
+	padding: 20px 14px;
+	width: 99%;
+
+
+}
+
+ul.list {
+	list-style: none;
+	margin-left: 0;
+}
+
+.description ul {
+	list-style: none;
+}
+
+#tblheaders {
+	display: flex;
+}
+
+#tblheaders div:hover{
+	background: #5c9eac;
+	color: white;
+	font-weight: bold;
+}
+
+#tblheaders div:hover * {
+	color: white;
+}
+
+#tblheaders div{
+	font-size: .9em;
+	margin: 2px 0 0 5px;
+	color: ##5c9eac;
+	cursor: pointer;
+	border: 1px solid #5c9eac;
+	width: 20%;
+	text-align: center;
+}
+
+#tblheaders a {
+
+}
+
+.year:before{content: "Year: "; font-weight: bold;}
+.grey_button:before{content: "Title: "; font-weight: bold;}
+.author:before{content: "Author: "; font-weight: bold;}
+.logolink:before{content: "URL: "; font-weight: bold;}
+.biblio:before{content: "Bibliographic Information: "; font-weight: bold;}
+.tags:before{content: "Tags: "; font-weight: bold;}
+.details:before{content: "Details: "; font-weight: bold;}
+
+
+#courses #tableheader td.publication-header {
+	width: 45%;
+}
+
+.weblink, .piinst, .instpi, .gdescript, .gtype {
+	margin: .4em 0;
+}
+
+
+
+.weblink a{
+	font-weight: bold;
+}
+
+.logolink img{
+	max-width: 50%;
+}
+
+.no-result {
+	display:none;
+}
+
+.aui .btn-danger {
+	background-color: #d94288;
+	background-image: none;
+}
+
+#courses .search {
+	margin: 2px 0 16px 4px;
+}
+
+@media only screen and (max-device-width: 480px) {
+	#courses table td.item {
+		width: 100%;
+	}
+	#courses table td {
+		width: 100%;
+		float: left;
+	}
+	#typechoice {
+		display: none;
+	}
+}
+</style>
+<script src="/app/site/media/Javascript/jquery-3.6.0.js"></script><script src="/app/site/media/Javascript/list.js"></script><script>
+  console.log("before getjson");
+
+  $.getJSON(
+    "https://sciencegateways.org/app/site/media/csvjsonResources.txt",
+    function(data) {
+      var html = data.map(function(resource) {
+        var author =
+          resource["Author(s)"] || "";
+
+        var year =
+          resource["Publication Year"] || "";
+
+        var title =
+          resource["Title"] || "";
+
+        var venue =
+          resource["Publication Venue"] || "";
+
+        var publisher =
+          resource["Publisher"] || "";
+
+        var publicationDetails =
+          resource["Additional Publication Details"] || "";
+
+        var url =
+          resource["URL"] || "";
+
+        var resourceType =
+          resource["Resource Type"] || "";
+
+        var domain =
+          resource["Domain(s) or Field(s)"] || "";
+
+        var tags =
+          resource["Tags"] || "";
+
+        var details =
+          resource["Abstract or Additional Details"] || "";
+
+        return `
+          <li class="list--list-item">
+            <table>
+              <tr>
+                <td class="type">
+                  ${resourceType}
+                </td>
+
+                <td class="item">
+                  <span class="grey_button">
+                    <a class="read_more_link" href="#/">
+                      <span class="resname">
+                        ${title}
+                      </span>
+                    </a>
+                  </span>
+                  <br />
+
+                  <span class="year">
+                    ${year}
+                  </span>
+                  <br />
+
+                  <span class="author">
+                    ${author}
+                  </span>
+                </td>
+
+                <td class="description">
+                  <span class="domain">
+                    ${domain}
+                  </span>
+                  <br />
+                </td>
+              </tr>
+
+              <tr>
+                <td colspan="4">
+                  <div class="tabstract">
+                    <div class="logolink">
+                      <a href="${url}">
+                        ${url}
+                      </a>
+                    </div>
+
+                    <div class="biblio">
+                      <br />
+                      <span class="venue">
+                        ${venue}
+                      </span>
+
+                      <span class="publisher">
+                        ${publisher}
+                      </span>
+
+                      <span class="pubdetails">
+                        ${publicationDetails}
+                      </span>
+                    </div>
+
+                    <div class="details">
+                      ${details}
+                    </div>
+
+                    <div class="tags">
+                      ${tags}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </li>
+        `;
+      });
+
+      $("#mypanel").append(html);
+    }
+  ).fail(function(jqXHR, textStatus, errorThrown) {
+    console.error(
+      "Resources JSON load failed:",
+      textStatus,
+      errorThrown
+    );
+
+    $("#mypanel").html(
+      '<li class="no-result">The resource list could not be loaded.</li>'
+    );
+  });
+</script>
+<div id="resourcecontainer">
+<div id="typechoice">
+<div id="typetitle"><a mailto:="">Resource Type</a></div>
+
+<div class="form-group">
+<div class="radio"><a mailto:=""><label><input checked="checked" class="filter-all" id="type-all" name="type" type="radio" value="all" /> All </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-book" name="type" type="radio" value="Book" /> Book </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-case" name="type" type="radio" value="Case Study" /> Case Study </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-collection" name="type" type="radio" value="Collection or Special Issue" /> Collection or Special Issue </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-learning" name="type" type="radio" value="Learning Material" /> Learning Material </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-report" name="type" type="radio" value="Report" /> Report </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter-all" id="type-research" name="type" type="radio" value="Research or Conference Paper" /> Research or Conference Paper </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-resource" name="type" type="radio" value="SGCI Resource" /> SGCI Resource </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-video" name="type" type="radio" value="Video or Webinar" /> Video or Webinar </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="type-website" name="type" type="radio" value="Website" /> Website </label></a></div>
+</div>
+
+<div id="domaintitle"><a mailto:="">Domain</a></div>
+
+<div class="form-group">
+<div class="radio"><a mailto:=""><label><input checked="checked" class="filter-all" id="domain-all" name="domain" type="radio" value="all" /> All </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="domain-computer" name="domain" type="radio" value="Computer" /> Computer and Information Sciences </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="domain-engineering" name="domain" type="radio" value="Engineering" /> Engineering </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter-all" id="domain-environmental" name="domain" type="radio" value="Environmental" /> Environmental Sciences </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="domain-humanities" name="domain" type="radio" value="Humanities" /> Humanities and Arts </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="domain-life" name="domain" type="radio" value="Life" /> Life Sciences </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter-all" id="domain-physical" name="domain" type="radio" value="Physical" /> Physical and Mathematical Sciences </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="domain-professional" name="domain" type="radio" value="Professional" /> Professional Disciplines (e.g., Business, Education, Law, Library/Information Science, Social Services, etc.) </label></a></div>
+
+<div class="radio"><a mailto:=""><label><input class="filter" id="domain-social" name="domain" type="radio" value="Social" /> Social Sciences </label></a></div>
+</div>
+</div>
+<!----END SELECTOR PANEL---><!-----BEGIN TABLE-------->
+
+<div id="tabledisplay">
+<div id="courses"><a mailto:=""><input class="search" placeholder="Search.." type="text" /> </a> <a mailto:=""> </a>
+
+<div><a mailto:=""><b>Sort by...</b></a></div>
+<a mailto:=""> </a>
+
+<div id="tblheaders">
+<div class="header-proj sort" data-sort="type"><a mailto:="">Type</a></div>
+
+<div class="header sort" data-sort="resname"><a mailto:="">Title</a></div>
+
+<div class="header sort" data-sort="year"><a mailto:="">Year</a></div>
+
+<div class="header sort" data-sort="author"><a mailto:="">Author</a></div>
+
+<div class="header-proj sort" data-sort="domain"><a mailto:="">Domain</a></div>
+</div>
+<a mailto:=""> </a>
+
+<p><a mailto:="">&nbsp;</a></p>
+<a mailto:=""> </a>
+
+<div class="clearbutton"><button class="btn btn-danger" onclick="window.location.reload()">Clear</button></div>
+<a mailto:=""> </a>
+
+<p><a mailto:="">&nbsp;</a></p>
+<a mailto:=""> </a>
+
+<table id="tableheader">
+	<tbody>
+		<tr>
+			<td class="type-header"><a mailto:=""><b>Type</b></a></td>
+			<td class="publication-header"><a mailto:=""><b>Publication</b></a></td>
+			<td class="domain-header"><a mailto:=""><b>Domain</b></a></td>
+		</tr>
+	</tbody>
+</table>
+<a mailto:=""> </a>
+
+<ul class="list results" id="mypanel">
+	<li><a mailto:="">&nbsp;</a></li>
+</ul>
+<a mailto:=""> </a>
+
+<div class="no-result"><a mailto:="">No Results</a></div>
+<a mailto:=""> </a></div>
+<a mailto:=""> </a></div>
+<a mailto:=""> </a></div>
+
+<p><a mailto:=""> <script>
+
+	setTimeout(function(){
+//USE ListJS to order
+
+
+//USE HERE
+		var options = {
+			valueNames: ['author', 'type', 'domain', 'resname', 'year', 'details', 'tags'],
+
+		};
+		var userList = new List('courses', options);
+
+		userList.sort('resname', { order: "asc" });
+
+		function resetList(){
+			userList.search();
+			userList.filter();
+			userList.update();
+			$('.filter-all').prop('checked', true);
+			$('.filter').prop('checked', false);
+			$('.search').val('');
+//console.log('Reset Successfully!');
+		};
+
+		function updateList(){
+			var values_type = $("input[name=type]:checked").val();
+			var values_domain = $("input[name=domain]:checked").val();
+			console.log(values_type, values_domain);
+
+			userList.filter(function (item) {
+				var typeFilter = false;
+				var domainFilter = false;
+
+				if(values_type == "all")
+				{
+					typeFilter = true;
+				} else {
+					typeFilter = item.values().type.indexOf(values_type) >= 0;
+
+				}
+				if(values_domain == "all")
+				{
+					domainFilter = true;
+				} else {
+					domainFilter = item.values().domain.indexOf(values_domain) >= 0;
+				}
+				return domainFilter && typeFilter
+			});
+			userList.update();
+			//console.log('Filtered: ' + values_type);
+		}
+
+		$(function(){
+			//updateList();
+			$("input[name=type]").change(updateList);
+			$('input[name=domain]').change(updateList);
+
+			userList.on('updated', function (list) {
+				if (list.matchingItems.length > 0) {
+					$('.no-result').hide()
+				} else {
+					$('.no-result').show()
+				}
+			});
+		});
+
+
+//END HERE
+
+	}, 4000);
+
+
+
+
+</script></a></p>
