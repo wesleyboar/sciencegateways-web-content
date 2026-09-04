@@ -1,0 +1,62 @@
+.mini-schedule-grid {
+	max-width: 1100px;
+}
+
+.mini-schedule-columns {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+}
+
+.mini-schedule-col h3 {
+	margin-bottom: 0.6rem;
+	font-size: 1.05rem;
+	line-height: 1.2;
+}
+
+.mini-schedule-col h3 span {
+	font-weight: normal;
+	color: #6b7280;
+}
+
+.mini-item {
+	display: flex;
+	gap: 0.6rem;
+	margin-bottom: 0.25rem;
+	line-height: 1.2;
+}
+
+.mini-time {
+	font-weight: 600;
+	font-size: 0.85rem;
+	color: #374151;
+	min-width: 95px;
+	flex-shrink: 0;
+}
+
+.mini-event {
+	font-size: 0.85rem;
+	color: #111827;
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+	.mini-schedule-columns {
+		grid-template-columns: 1fr;
+	}
+
+	.mini-time {
+		min-width: 85px;
+	}
+}
+.mini-event a {
+	color: #174c6b;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.mini-event a:hover,
+.mini-event a:focus {
+	color: #0f344b;
+	text-decoration-thickness: 2px;
+}
