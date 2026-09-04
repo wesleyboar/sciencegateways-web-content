@@ -1,6 +1,6 @@
 'use strict';
 
-const JSON_FILE_NAME = window.GATEWAYS_JSON_FILE_NAME || '2026_CONFERENCE_SCHEDULE.txt';
+const JSON_FILE_NAME = window.GATEWAYS_JSON_FILE_NAME || '2026_CONFERENCE_SCHEDULE.json';
 const JSON_URL = `${window.location.origin}/app/site/media/files/gateways202n/${JSON_FILE_NAME}`;
 
 const scheduleElement =
