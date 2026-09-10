@@ -305,12 +305,23 @@ function sanitizeText_(value) {
 }
 
 // Name of the tab holding the session-block talks/papers data (the
-// "#, Type, Title, Min" layout). Change this if that tab isn't
-// actually named "Talks" in your spreadsheet.
+// "#, Type, Title, Authors, Min" layout). Only used when EXPORT_ALL_TABS
+// is false below.
 const TALKS_SHEET_NAME = "Talks";
 
-function parseTalksFromActiveSheet_(warnings) {
+// When true (default), every tab in the spreadsheet is scanned for the
+// "Session N:" layout (except "Tutorials", which has its own flat
+// schema and is parsed separately by parseTutorialsTab_ below) — so
+// talks/papers split across multiple tabs are all picked up. Set to
+// false to restore the original single-tab behavior driven by
+// TALKS_SHEET_NAME (with its active-tab fallback).
+const EXPORT_ALL_TABS = true;
+
+function getTalksSheets_(warnings) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (EXPORT_ALL_TABS) {
+    return ss.getSheets().filter(s => s.getName() !== "Tutorials");
+  }
   let sheet = ss.getSheetByName(TALKS_SHEET_NAME);
   if (!sheet) {
     // Fall back to whichever tab is active, so this still works if
@@ -324,104 +335,111 @@ function parseTalksFromActiveSheet_(warnings) {
       "update TALKS_SHEET_NAME at the top of the script."
     );
   }
-  // Resolved text (rich-text/link-aware), not display values — see
-  // extractCellText_ / getResolvedTextGrid_ above. This avoids both
-  // the Date-object timezone bug and the chip/hyperlink truncation
-  // bug in one pass.
-  const values = getResolvedTextGrid_(sheet);
+  return [sheet];
+}
 
+function parseTalksFromActiveSheet_(warnings) {
+  const sheets = getTalksSheets_(warnings);
   const events = [];
-  let i = 0;
 
-  while (i < values.length) {
-    const row = values[i];
+  sheets.forEach(sheet => {
+    // Resolved text (rich-text/link-aware), not display values — see
+    // extractCellText_ / getResolvedTextGrid_ above. This avoids both
+    // the Date-object timezone bug and the chip/hyperlink truncation
+    // bug in one pass.
+    const values = getResolvedTextGrid_(sheet);
+    let i = 0;
 
-    if (isSessionHeaderRow_(row)) {
-      const sessionTitle = String(row[0]).trim();
-      const config = SESSION_CONFIG[sessionTitle];
-      if (!config) {
-        warnings.push('No SESSION_CONFIG entry for "' + sessionTitle + '" — skipping this block. Add it to SESSION_CONFIG in the script.');
-        i++;
-        continue;
-      }
+    while (i < values.length) {
+      const row = values[i];
 
-      i++; // move to sub-header row
-      if (i >= values.length || !isSubHeaderRow_(values[i])) {
-        warnings.push('Expected "#, Type, Title, Min" header row right after "' + sessionTitle + '" but did not find it.');
-        continue;
-      }
-      i++; // move to first data row
-
-      let cursorMin = parseTimeToMinutes_(config.start);
-      let talkNum = 0;
-
-      while (i < values.length && !isTotalsRow_(values[i]) && !isBlankRow_(values[i])) {
-        const dataRow = values[i];
-        const num = String(dataRow[0] || "").trim();
-        const type = String(dataRow[1] || "").trim();
-        const title = String(dataRow[2] || "").trim();
-        const speakers = String(dataRow[3] || "").trim();
-        const mins = Number(dataRow[4]);
-        const extra = String(dataRow[5] || "").trim(); // Poster/BYOP flag
-
-        if (!num || !title || !mins) {
-          warnings.push("Session \"" + sessionTitle + "\" row " + (i + 1) + ": incomplete row, skipping.");
+      if (isSessionHeaderRow_(row)) {
+        const sessionTitle = String(row[0]).trim();
+        const config = SESSION_CONFIG[sessionTitle];
+        if (!config) {
+          warnings.push('No SESSION_CONFIG entry for "' + sessionTitle + '" — skipping this block. Add it to SESSION_CONFIG in the script.');
           i++;
           continue;
         }
 
-        const startMin = cursorMin;
-        const endMin = cursorMin + mins;
-        cursorMin = endMin;
-        talkNum++;
+        i++; // move to sub-header row
+        if (i >= values.length || !isSubHeaderRow_(values[i])) {
+          warnings.push('Expected "#, Type, Title, Min" header row right after "' + sessionTitle + '" but did not find it.');
+          continue;
+        }
+        i++; // move to first data row
 
-        let description = "**Session Moderator:** " + config.moderator;
+        let cursorMin = parseTimeToMinutes_(config.start);
+        let talkNum = 0;
 
-        events.push({
-          id: "TALK" + String(num).padStart(3, "0"),
-          date: config.date,
-          session_start_time: config.start,
-          session_end_time: config.end,
-          event_start_time: minutesToTime_(startMin),
-          event_end_time: minutesToTime_(endMin),
-          timezone: TIMEZONE,
-          session_title: sessionTitle,
-          title: title,
-          type: type.toLowerCase(),
-          speakers: speakers,
-          description: description,
-          location: "",
-          format: "In-person",
-          registration_url: "",
-          visible: "TRUE",
-          expandable: "TRUE",
-        });
+        while (i < values.length && !isTotalsRow_(values[i]) && !isBlankRow_(values[i])) {
+          const dataRow = values[i];
+          const num = String(dataRow[0] || "").trim();
+          const type = String(dataRow[1] || "").trim();
+          const title = String(dataRow[2] || "").trim();
+          const speakers = String(dataRow[3] || "").trim();
+          const mins = Number(dataRow[4]);
+          const extra = String(dataRow[5] || "").trim(); // Poster/BYOP flag
 
-        if (extra) {
-          events[events.length - 1].poster_or_byop_flag = extra;
+          if (!num || !title || !mins) {
+            warnings.push("Session \"" + sessionTitle + "\" row " + (i + 1) + ": incomplete row, skipping.");
+            i++;
+            continue;
+          }
+
+          const startMin = cursorMin;
+          const endMin = cursorMin + mins;
+          cursorMin = endMin;
+          talkNum++;
+
+          let description = "**Session Moderator:** " + config.moderator;
+
+          events.push({
+            id: "TALK" + String(num).padStart(3, "0"),
+            date: config.date,
+            session_start_time: config.start,
+            session_end_time: config.end,
+            event_start_time: minutesToTime_(startMin),
+            event_end_time: minutesToTime_(endMin),
+            timezone: TIMEZONE,
+            session_title: sessionTitle,
+            title: title,
+            type: type.toLowerCase(),
+            speakers: speakers,
+            description: description,
+            location: "",
+            format: "In-person",
+            registration_url: "",
+            visible: "TRUE",
+            expandable: "TRUE",
+          });
+
+          if (extra) {
+            events[events.length - 1].poster_or_byop_flag = extra;
+          }
+
+          const built = events[events.length - 1];
+          Object.keys(built).forEach(k => {
+            if (typeof built[k] === "string") built[k] = sanitizeText_(built[k]);
+          });
+
+          i++;
         }
 
-        const built = events[events.length - 1];
-        Object.keys(built).forEach(k => {
-          if (typeof built[k] === "string") built[k] = sanitizeText_(built[k]);
-        });
+        const sessionWindowMin = parseTimeToMinutes_(config.end) - parseTimeToMinutes_(config.start);
+        const usedMin = cursorMin - parseTimeToMinutes_(config.start);
+        if (usedMin > sessionWindowMin) {
+          warnings.push('"' + sessionTitle + '": talks total ' + usedMin + ' min but session window is only ' + sessionWindowMin + ' min (over by ' + (usedMin - sessionWindowMin) + ').');
+        }
 
-        i++;
+        // skip totals row + any trailing blank row
+        if (i < values.length && isTotalsRow_(values[i])) i++;
+        continue;
       }
 
-      const sessionWindowMin = parseTimeToMinutes_(config.end) - parseTimeToMinutes_(config.start);
-      const usedMin = cursorMin - parseTimeToMinutes_(config.start);
-      if (usedMin > sessionWindowMin) {
-        warnings.push('"' + sessionTitle + '": talks total ' + usedMin + ' min but session window is only ' + sessionWindowMin + ' min (over by ' + (usedMin - sessionWindowMin) + ').');
-      }
-
-      // skip totals row + any trailing blank row
-      if (i < values.length && isTotalsRow_(values[i])) i++;
-      continue;
+      i++;
     }
-
-    i++;
-  }
+  });
 
   return events;
 }
