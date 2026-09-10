@@ -150,6 +150,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("Output Schedule json")
     .addItem("Build JSON (preview / copy)", "buildJsonPreview")
+    .addItem("Download JSON…", "buildJsonDownload")
     .addItem("Build JSON to Drive", "buildJsonToDrive")
     .addToUi();
 }
@@ -571,6 +572,52 @@ function buildJsonPreview() {
 
 
   ui.showModalDialog(html, "Schedule JSON");
+}
+
+// Client-side download, same pattern as json-output-from-tacc.gs's
+// downloadJson(): builds a Blob URL in the browser, so no DriveApp
+// scope is needed (unlike buildJsonToDrive below).
+function buildJsonDownload() {
+  const ui = SpreadsheetApp.getUi();
+  const result = buildAll_();
+  const json = JSON.stringify(result.events, null, 2);
+
+  const validationError = validateJson_(json);
+  if (validationError) {
+    ui.alert("JSON self-check failed", validationError, ui.ButtonSet.OK);
+    return;
+  }
+
+  const filename = "2026_CONFERENCE_SCHEDULE.json";
+  let message = "Built " + result.events.length + " events. Self-check passed (valid JSON).";
+  if (result.warnings.length) {
+    message += "\n\nWARNINGS:\n" + result.warnings.join("\n");
+  }
+
+  const html = HtmlService.createHtmlOutput(`
+      <style>
+        body { font: 13px/1.5 Arial, sans-serif; margin: 16px }
+        a.btn {
+          display: inline-block; padding: 8px 14px;
+          background: #1a73e8; color: #fff;
+          border-radius: 4px; text-decoration: none;
+        }
+      </style>
+      <p>${message.replace(/\n/g, "<br>")}</p>
+      <p>
+        <a class="btn" id="dl" download="${filename}"
+          >Download ${filename}</a>
+      </p>
+      <script>
+        const text = ${JSON.stringify(json)};
+        document.getElementById('dl').href = URL.createObjectURL(
+          new Blob([text], { type: 'application/json' }));
+      </script>
+    `)
+    .setWidth(460)
+    .setHeight(220);
+
+  ui.showModalDialog(html, "Download Schedule JSON");
 }
 
 function buildJsonToDrive() {
