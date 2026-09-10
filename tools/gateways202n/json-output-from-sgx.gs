@@ -6,18 +6,20 @@
  * EXPECTED LAYOUT (same as your current sheet):
  *
  *   "Session 1: Platforms, Portals and Federation",,,,Accepted Poster/BYOP Offer?
- *   #,Type,Title,Min,
- *   10,PAPER,"Building a Portal for the NAIRR... - Jeanette Sperhac, ...",14,
- *   17,PAPER,"...",14,
+ *   #,Type,Title,Authors,Min,Accepted Poster/BYOP Offer?,Abstract
+ *   10,PAPER,"Building a Portal for the NAIRR Pilot Project","Jeanette Sperhac, ...",14,,"..."
+ *   17,PAPER,"...","...",14,,"..."
  *   ...
- *   ,,,80,                      <- totals row ends the session block
+ *   ,,,,80,                     <- totals row ends the session block
  *   (blank row)
  *   "Session 2: ...",,,,
- *   #,Type,Title,Min,
+ *   #,Type,Title,Authors,Min,Accepted Poster/BYOP Offer?,Abstract
  *   ...
  *
- * Title cells must be "Title text - Speaker One, Speaker Two" (single
- * " - " separator between title and speaker list — matches your CSV).
+ * Title and Authors are separate columns (Authors is a comma-separated
+ * speaker list). The Abstract column exists in the sheet but isn't read
+ * by this script — talks/papers still get a fixed moderator-only
+ * description below.
  *
  * SESSION_CONFIG below supplies the date/start/end/moderator for each
  * session, since the sheet itself doesn't contain that. Edit this
@@ -69,18 +71,13 @@
  *                               "Session 1: Platforms, Portals and
  *                               Federation". Used by the page's JS to
  *                               group events under one header.
- *   title                 string  The talk/paper/tutorial title only,
- *                               with the " - Speaker Name(s)" suffix
- *                               stripped off.
+ *   title                 string  The talk/paper/tutorial title only
+ *                               (the sheet's Title column).
  *   type                   string  Lowercased event type: "paper",
  *                               "talk", or "tutorial". Drives the
  *                               filter dropdown and colored tag on the
  *                               live page.
- *   speakers               string  Comma-separated speaker names, taken
- *                               from whatever followed the last " - "
- *                               in the sheet's Title cell. Blank if no
- *                               " - " separator was found (a warning is
- *                               raised in that case).
+ *   speakers               string  The sheet's Authors column, as-is.
  *   description             string  Rendered (with basic markdown —
  *                               **bold** and [text](url) links) in the
  *                               expandable detail view on the page.
@@ -112,8 +109,8 @@
  *                               description/location/format/timezone/
  *                               registration link in the UI.
  *   poster_or_byop_flag           string  OPTIONAL — only present when
- *                               the sheet's 5th column (Accepted
- *                               Poster/BYOP Offer?) was non-blank for
+ *                               the sheet's "Accepted Poster/BYOP
+ *                               Offer?" column was non-blank for
  *                               that row, e.g. "Poster" or "BYOP". Not
  *                               read or displayed by the current page
  *                               JS; kept for traceability back to the
@@ -213,8 +210,9 @@ function isTotalsRow_(row) {
   const first = String(row[0] || "").trim();
   const type = String(row[1] || "").trim();
   const title = String(row[2] || "").trim();
-  const min = String(row[3] || "").trim();
-  return first === "" && type === "" && title === "" && min !== "";
+  const authors = String(row[3] || "").trim();
+  const min = String(row[4] || "").trim();
+  return first === "" && type === "" && title === "" && authors === "" && min !== "";
 }
 
 function isBlankRow_(row) {
@@ -361,23 +359,15 @@ function parseTalksFromActiveSheet_(warnings) {
         const dataRow = values[i];
         const num = String(dataRow[0] || "").trim();
         const type = String(dataRow[1] || "").trim();
-        const rawTitle = String(dataRow[2] || "").trim();
-        const mins = Number(dataRow[3]);
-        const extra = String(dataRow[4] || "").trim(); // Poster/BYOP flag
+        const title = String(dataRow[2] || "").trim();
+        const speakers = String(dataRow[3] || "").trim();
+        const mins = Number(dataRow[4]);
+        const extra = String(dataRow[5] || "").trim(); // Poster/BYOP flag
 
-        if (!num || !rawTitle || !mins) {
+        if (!num || !title || !mins) {
           warnings.push("Session \"" + sessionTitle + "\" row " + (i + 1) + ": incomplete row, skipping.");
           i++;
           continue;
-        }
-
-        const sepIdx = rawTitle.lastIndexOf(" - ");
-        let title = rawTitle, speakers = "";
-        if (sepIdx !== -1) {
-          title = rawTitle.substring(0, sepIdx).trim();
-          speakers = rawTitle.substring(sepIdx + 3).trim();
-        } else {
-          warnings.push("Session \"" + sessionTitle + "\" #" + num + ": no \" - \" separator found, speakers left blank.");
         }
 
         const startMin = cursorMin;
