@@ -411,12 +411,12 @@ if (event.location) {
     `);
 }
 
-if (event.format) {
+if (event.title) {
     meta.push(`
     <div>
-        <dt>Format</dt>
+        <dt>Title</dt>
         <dd>
-        ${escapeHtml(event.format)}
+        ${escapeHtml(event.title)}
         </dd>
     </div>
     `);
