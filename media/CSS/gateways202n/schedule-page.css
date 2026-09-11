@@ -402,8 +402,6 @@
 
 .schedule-page .schedule-meta {
   display: grid;
-  grid-template-columns:
-    repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px 24px;
   margin: 0;
   padding: 16px;

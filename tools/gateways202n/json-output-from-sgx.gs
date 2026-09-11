@@ -16,11 +16,6 @@
  *   #,Type,Title,Authors,Min,Accepted Poster/BYOP Offer?,Abstract
  *   ...
  *
- * Title and Authors are separate columns (Authors is a comma-separated
- * speaker list). The Abstract column exists in the sheet but isn't read
- * by this script — talks/papers still get a fixed moderator-only
- * description below.
- *
  * SESSION_CONFIG below supplies the date/start/end/moderator for each
  * session, since the sheet itself doesn't contain that. Edit this
  * block if session times, dates, or moderators change.
@@ -73,6 +68,10 @@
  *                               group events under one header.
  *   title                 string  The talk/paper/tutorial title only
  *                               (the sheet's Title column).
+ *   abstract              string  OPTIONAL — the sheet's Abstract column
+ *                               for that row, if non-blank. Rendered as
+ *                               a labeled "Abstract" field in the
+ *                               expandable detail view on the page.
  *   type                   string  Lowercased event type: "paper",
  *                               "talk", or "tutorial". Drives the
  *                               filter dropdown and colored tag on the
@@ -380,6 +379,7 @@ function parseTalksFromActiveSheet_(warnings) {
           const speakers = String(dataRow[3] || "").trim();
           const mins = Number(dataRow[4]);
           const extra = String(dataRow[5] || "").trim(); // Poster/BYOP flag
+          const abstract = String(dataRow[6] || "").trim();
 
           if (!num || !title || !mins) {
             warnings.push("Session \"" + sessionTitle + "\" row " + (i + 1) + ": incomplete row, skipping.");
@@ -416,6 +416,10 @@ function parseTalksFromActiveSheet_(warnings) {
 
           if (extra) {
             events[events.length - 1].poster_or_byop_flag = extra;
+          }
+
+          if (abstract) {
+            events[events.length - 1].abstract = abstract;
           }
 
           const built = events[events.length - 1];
@@ -495,6 +499,11 @@ function parseTutorialsTab_(warnings) {
     FLAT_FIELDS.forEach(f => { event[f] = sanitizeText_(event[f]); });
     if (event.date && !/^\d{4}-\d{2}-\d{2}$/.test(event.date)) {
       warnings.push('Tutorials tab, id=' + event.id + ': date "' + event.date + '" is not in YYYY-MM-DD format. Check the cell\'s format (Format > Number > Plain text, or re-enter as plain text) so it displays exactly as YYYY-MM-DD.');
+    }
+    const abstractCol = headers.indexOf("abstract");
+    if (abstractCol !== -1) {
+      const abstract = sanitizeText_(String(row[abstractCol] || "").trim());
+      if (abstract) event.abstract = abstract;
     }
     event.visible = /^(true|yes|1)$/i.test(event.visible) ? "TRUE" : "FALSE";
     event.expandable = /^(true|yes|1)$/i.test(event.expandable) ? "TRUE" : "FALSE";
