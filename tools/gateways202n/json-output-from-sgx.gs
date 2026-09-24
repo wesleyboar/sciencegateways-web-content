@@ -1,4 +1,9 @@
 /**
+ * VERSION CONTROL
+ * https://github.com/wesleyboar/sciencegateways-web-content
+ */
+
+/**
  * Schedule JSON Builder — parses the EXISTING sheet layout directly
  * (session header rows + "#, Type, Title, Min" sub-tables), instead of
  * requiring a flat one-row-per-event schema.
