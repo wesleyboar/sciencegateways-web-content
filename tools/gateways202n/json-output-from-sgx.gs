@@ -1,4 +1,9 @@
 /**
+ * VERSION CONTROL
+ * https://github.com/wesleyboar/sciencegateways-web-content
+ */
+
+/**
  * Schedule JSON Builder — parses the EXISTING sheet layout directly
  * (session header rows + "#, Type, Title, Min" sub-tables), instead of
  * requiring a flat one-row-per-event schema.
@@ -369,7 +374,6 @@ function parseTalksFromActiveSheet_(warnings) {
         i++; // move to first data row
 
         let cursorMin = parseTimeToMinutes_(config.start);
-        let talkNum = 0;
 
         while (i < values.length && !isTotalsRow_(values[i]) && !isBlankRow_(values[i])) {
           const dataRow = values[i];
@@ -381,26 +385,32 @@ function parseTalksFromActiveSheet_(warnings) {
           const extra = String(dataRow[5] || "").trim(); // Poster/BYOP flag
           const abstract = String(dataRow[6] || "").trim();
 
-          if (!num || !title || !mins) {
-            warnings.push("Session \"" + sessionTitle + "\" row " + (i + 1) + ": incomplete row, skipping.");
+          if (!title) {
             i++;
             continue;
           }
 
-          const startMin = cursorMin;
-          const endMin = cursorMin + mins;
-          cursorMin = endMin;
-          talkNum++;
+          let eventStartTime = "";
+          let eventEndTime = "";
+          if (mins) {
+            const startMin = cursorMin;
+            const endMin = cursorMin + mins;
+            cursorMin = endMin;
+            eventStartTime = minutesToTime_(startMin);
+            eventEndTime = minutesToTime_(endMin);
+          }
 
           let description = "**Session Moderator:** " + config.moderator;
 
           events.push({
-            id: "TALK" + String(num).padStart(3, "0"),
+            id: num
+              ? "TALK" + String(num).padStart(3, "0")
+              : "TALK" + String(i + 1).padStart(3, "_"),
             date: config.date,
             session_start_time: config.start,
             session_end_time: config.end,
-            event_start_time: minutesToTime_(startMin),
-            event_end_time: minutesToTime_(endMin),
+            event_start_time: eventStartTime,
+            event_end_time: eventEndTime,
             timezone: TIMEZONE,
             session_title: sessionTitle,
             title: title,
