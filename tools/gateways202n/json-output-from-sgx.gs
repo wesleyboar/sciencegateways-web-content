@@ -398,7 +398,9 @@ function parseTalksFromActiveSheet_(warnings) {
           let description = "**Session Moderator:** " + config.moderator;
 
           events.push({
-            id: num ? "TALK" + String(num).padStart(3, "0") : "TALK-R" + (i + 1),
+            id: num
+              ? "TALK" + String(num).padStart(3, "0")
+              : "TALK" + String(i + 1).padStart(3, "_"),
             date: config.date,
             session_start_time: config.start,
             session_end_time: config.end,
